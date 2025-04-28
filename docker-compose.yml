@@ -1,24 +1,22 @@
-version: '3.8'
-# (No 'version:' line needed)
-
 services:
   api:
-    build: .
-    command: uvicorn sandbox_server:app --host 0.0.0.0 --port 8000 --reload
+    build:
+      context: .
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - "8000:8000"
     depends_on:
+      - python_runtime
       - c_runtime
-      - python_runtime    # matches the service key below
       - js_runtime
       - pwsh_runtime
       - bash_runtime
 
-  c_runtime:
-    image: gcc:latest
+  python_runtime:
+    build:
+      context: ./runtimes/python
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -27,42 +25,17 @@ services:
           memory: 256M
           cpus: '0.5'
 
-  python_runtime:
-    image: python:3.10-slim
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
+  c_runtime:
+    build:
+      context: ./runtimes/c
 
   js_runtime:
-    image: node:16-slim
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
+    build:
+      context: ./runtimes/javascript
+
+  bash_runtime:
+    build:
+      context: ./runtimes/bash
 
   pwsh_runtime:
     image: mcr.microsoft.com/powershell:latest
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
-
-  bash_runtime:
-    image: debian:stable-slim
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'

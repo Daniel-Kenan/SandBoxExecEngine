@@ -57,13 +57,12 @@ async def run_code(req: CodeRequest):
             volumes={workdir: {'bind': '/sandbox', 'mode': 'rw'}},
             network_disabled=True,
             auto_remove=True,
-            stderr=True,
             stdout=True,
+            stderr=True,
             working_dir="/sandbox",
             detach=False,
-            stdout=True,
-            stderr=True,
         )
+
         # clean up
         shutil.rmtree(workdir, ignore_errors=True)
         return {"output": output.decode()}
